@@ -28,16 +28,30 @@ client.once(Events.ClientReady, c => {
 client.login(process.env.TOKEN);
 
 //Listener de interações
-client.on(Events.InteractionCreate, async i => {
-    if(!i.isChatInputCommand()) return
-    const command = i.client.commands.get(i.commandName);
-    if(!command){
-        console.error('Comando não encontrado!')
-        return;
+client.on(Events.InteractionCreate, async interaction =>{
+    if (interaction.isStringSelectMenu()){
+        const selected = interaction.values[0]
+        if (selected == "javascript"){
+            await interaction.reply("Documentação do Javascript: https://developer.mozilla.org/en-US/docs/Web/JavaScript")
+        } else if (selected == "python"){
+            await interaction.reply("Documentação do Python: https://www.python.org")
+        } else if (selected == "csharp"){
+            await interaction.reply("Documentação do C#: https://learn.microsoft.com/en-us/dotnet/csharp/")
+        } else if (selected == "discordjs"){
+            await interaction.reply("Documentação do Discord.js: https://discordjs.guide/#before-you-begin")
+        }
     }
-    try{
-        await command.execute(i)
-    }catch(err){
-        await i.reply("Erro ao executar esse comando!")
+    if (!interaction.isChatInputCommand()) return
+    const command = interaction.client.commands.get(interaction.commandName)
+    if (!command) {
+        console.error("Comando não encontrado")
+        return
+    }
+    try {
+        await command.execute(interaction)
+    } 
+    catch (error) {
+        console.error(error)
+        await interaction.reply("Houve um erro ao executar esse comando!")
     }
 })
